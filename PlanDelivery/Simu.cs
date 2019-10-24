@@ -9,7 +9,7 @@ namespace PlanDelivery
         /// <summary>
         /// External to this project
         /// </summary>
-        DataTable PickupTable { get; set; }
+        public DataTable PickupTable { get; set; }
 
         public Simu(DataSet simuDataSet)
         {

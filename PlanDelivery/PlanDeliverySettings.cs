@@ -8,7 +8,7 @@ namespace PlanDelivery
     {
         public string HoursString = " ";
         //public static DateTime Truncate(this DateTime dateTime, TimeSpan timeSpan)
-        public DateTime Truncate(DateTime dateTime, TimeSpan timeSpan)
+        static public DateTime Truncate(DateTime dateTime, TimeSpan timeSpan)
         {
             if (timeSpan == TimeSpan.Zero) return dateTime;
             if (dateTime == DateTime.MinValue || dateTime == DateTime.MaxValue) return dateTime;
@@ -94,72 +94,26 @@ namespace PlanDelivery
         /// </summary>
         public string[] DeliveryDays { get; set; } = new string[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
 
-        public DataTable GetSlotsTableStruc()
-        {
-            DataTable table = new DataTable();
-            table.Columns.Add("PickupId", typeof(int));
-            table.Columns.Add("Hour", typeof(TimeSpan));
-            //table.Columns.Add("Description?", typeof(TimeSpan));
-            table.Columns.Add("Mon", typeof(int));
-            table.Columns.Add("Tue", typeof(int));
-            table.Columns.Add("Wed", typeof(int));
-            table.Columns.Add("Thu", typeof(int));
-            table.Columns.Add("Fri", typeof(int));
-            table.Columns.Add("Sat", typeof(int));
-            table.Columns.Add("Sun", typeof(int));
-            //table.DataSet.Relations.Add...
-            return table;
-        }
 
-        public void InitSlotTable(DataTable SlotsTable)//,pickupId
-        {
-            //From PickupId
-            DataRow row;
-            for (int h = DeliveryStartsAt.Hours; h < DeliveryStopsAt.Hours; h += TimeSlotDuration)
-            {
-                row = SlotsTable.NewRow();
-                row["PickupId"] = PickupId;
-                row["Hour"] = TimeSpan.FromHours(h);
-                if (h >= DeliveryStartsAt.Hours && h <= DeliveryStopsAt.Hours)
-                {
-                    foreach (string d in DeliveryDays)
-                    {
-                        row[d] = DefaultTimeSlotCapacity;
-                    }
-                }
-                SlotsTable.Rows.Add(row);
-            }
-        }
-        /// <summary>
-        /// New weekly timeslots with copy
-        /// </summary>
-        /// <param name="PickupId"></param>
-        public void GenerateDefaultTimeSlots(int PickupId, int PickupIdCopyFrom = -1)
-        {
-        }
-
-    }
-
-    public class PlanDeliveryVacation
-    {
- 
     }
 
     public class PlanDelivery
     {
-        PlanDeliveryByPickupSettings settings = new PlanDeliveryByPickupSettings();
+        public PlanDeliveryByPickupSettings Settings { get; set; }
+            = new PlanDeliveryByPickupSettings();
 
-        public DataTable VacationTable;
+        public DataTable VacationTable { get; set; }
 
-        public DataTable BookingTable;
+        public DataTable BookingTable { get; set; }
+        public DataTable TimeSlotTable { get; set; }
         public void MakeBookingTable()
         {
-            DateTime start = settings.MinDate;
+            DateTime start = Settings.MinDate;
             BookingTable = new DataTable("BookingTable");
 
-            string colName = settings.HoursString;
+            string colName = Settings.HoursString;
             BookingTable.Columns.Add(colName, typeof(string));
-            for (int i = 0; i < settings.DateRange + 1; i++)
+            for (int i = 0; i < Settings.DateRange + 1; i++)
             {
                 DateTime date1 = start.AddDays(i);
 
@@ -168,14 +122,14 @@ namespace PlanDelivery
                 BookingTable.Columns.Add(colName, typeof(string));
             }
             //Must take in account Summer lightning
-            for (int h = settings.DeliveryStartsAt.Hours; h < settings.DeliveryStopsAt.Hours; h += settings.TimeSlotDuration)
+            for (int h = Settings.DeliveryStartsAt.Hours; h < Settings.DeliveryStopsAt.Hours; h += Settings.TimeSlotDuration)
             {
                 DataRow row = BookingTable.NewRow();
-                string s = String.Format("{0:00}H00 - {1:00}H00", h, h + settings.TimeSlotDuration);
-                row[settings.HoursString] = s;
+                string s = String.Format("{0:00}H00 - {1:00}H00", h, h + Settings.TimeSlotDuration);
+                row[Settings.HoursString] = s;
                 for (int i = 1; i < BookingTable.Columns.Count; i++)
                 {
-                    row[i] = settings.DefaultFee+"€";
+                    row[i] = Settings.DefaultFee + "€";
                     //if ... row[i] = "-"
                     //TimeSlots[i]--;
                 }
@@ -188,35 +142,6 @@ namespace PlanDelivery
 
         }
 
-        /// <summary>
-        /// Table should be transposed: rows become columns
-        /// so that it is wide oriented
-        /// </summary>
-        /// <param name="year"></param>
-        public void BuildVacationTable(int year)
-        {
-            VacationTable = new DataTable();
-            VacationTable.Columns.Add("Id", typeof(int));
-            VacationTable.Columns.Add("PickupId", typeof(int));
-            //table.Columns.Add("Year", typeof(int));
-            //table.Columns.Add("Month", typeof(int));
-            VacationTable.Columns.Add("WeekNo", typeof(int));
-            foreach (string sMonth in new string[]
-            { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" })
-                VacationTable.Columns.Add(sMonth, typeof(int));
-
-            //table.Columns.Add("Date", typeof(DateTime));
-            //table.Columns.Add("IsHoliday", typeof(bool));
-            DateTime t = DateTime.Now;
-
-            CultureInfo myCI = new CultureInfo("en-US");
-            Calendar myCal = myCI.Calendar;
-            // Gets the DTFI properties required by GetWeekOfYear.
-            CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
-            DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
-
-            myCal.GetWeekOfYear(t, myCWR, myFirstDOW);
-        }
 
         public void BuildVacationTableV1()
         {
@@ -248,20 +173,100 @@ namespace PlanDelivery
 
         }
 
+
+        /// <summary>
+        /// Table should be transposed: rows become columns
+        /// so that it is wide oriented
+        /// </summary>
+        /// <param name="year"></param>
+        public void BuildVacationTable(int year)
+        {
+            DataColumn col;
+            VacationTable = new DataTable();
+            VacationTable.Columns.Add("PickupId", typeof(int));
+            col = VacationTable.Columns.Add("Id", typeof(int));
+            col.AutoIncrement = true;
+            VacationTable.Columns.Add("WeekNo", typeof(int));
+            foreach (string sDay in new string[]
+            { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" })
+                VacationTable.Columns.Add(sDay, typeof(int));
+            VacationTable.Columns.Add("Description", typeof(string));
+
+            DateTime t = DateTime.Now;
+
+            CultureInfo myCI = new CultureInfo("en-US");
+            Calendar myCal = myCI.Calendar;
+            // Gets the DTFI properties required by GetWeekOfYear.
+            CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
+            DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
+
+            myCal.GetWeekOfYear(t, myCWR, myFirstDOW);
+        }
+
+
         public void SeedVacationTable(int year)
         {
             if (VacationTable == null)
                 BuildVacationTable(DateTime.Now.Year);
+
             for (int d = 1; d < 31; d++)
             {
                 DateTime date = new DateTime(year, 08, d);
                 DataRow row = VacationTable.NewRow();
-                row["Date"] = date;
+                foreach (string sDay in new string[]
+                { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" })
+                    row[sDay] = 1;
+                row["Description"] = "Summer vacation";
                 VacationTable.Rows.Add(row);
             }
             //Add French Public holidays
 
         }
+
+        public void MakeTimeSlotTableStruc()
+        {
+            DataTable table = new DataTable();
+            table.Columns.Add("PickupId", typeof(int));
+            table.Columns.Add("Hour", typeof(TimeSpan));
+            //table.Columns.Add("Description?", typeof(TimeSpan));
+            table.Columns.Add("Mon", typeof(int));
+            table.Columns.Add("Tue", typeof(int));
+            table.Columns.Add("Wed", typeof(int));
+            table.Columns.Add("Thu", typeof(int));
+            table.Columns.Add("Fri", typeof(int));
+            table.Columns.Add("Sat", typeof(int));
+            table.Columns.Add("Sun", typeof(int));
+            //table.DataSet.Relations.Add...
+        }
+
+        public void InitSlotTable(int PickupId)
+        {
+        
+            //From PickupId
+            DataRow row;
+            for (int h = Settings.DeliveryStartsAt.Hours; h < Settings.DeliveryStopsAt.Hours; h += Settings.TimeSlotDuration)
+            {
+                row = TimeSlotTable.NewRow();
+                row["PickupId"] = PickupId;
+                row["Hour"] = TimeSpan.FromHours(h);
+                if (h >= Settings.DeliveryStartsAt.Hours && h <= Settings.DeliveryStopsAt.Hours)
+                {
+                    foreach (string d in Settings.DeliveryDays)
+                    {
+                        row[d] = Settings.DefaultTimeSlotCapacity;
+                    }
+                }
+                TimeSlotTable.Rows.Add(row);
+            }
+        }
+        /// <summary>
+        /// New weekly timeslots with copy
+        /// </summary>
+        /// <param name="PickupId"></param>
+        public void GenerateDefaultTimeSlots(int PickupId, int PickupIdCopyFrom = -1)
+        {
+        }
+
 
     }
 }

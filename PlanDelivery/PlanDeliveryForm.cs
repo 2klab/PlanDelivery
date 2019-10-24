@@ -11,27 +11,26 @@ namespace PlanDelivery
             InitializeComponent();
         }
 
-        PlanDeliveryByPickupSettings PlanDeliveryByPickupSettings = new PlanDeliveryByPickupSettings();
+        PlanDelivery plan;
 
         static DataSet SimuDS = new DataSet("Simu");
         Simu NopSimu = new Simu(SimuDS);
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
-            propertyGrid1.SelectedObject = PlanDeliveryByPickupSettings;
-            comboBoxPickupPoint.DataSource = NopSimu.PickupTable;
-            comboBoxPickupPoint.DisplayMember = "PickupName";
-            dataGridSlots.DataSource = NopSimu.SlotTable;
-
-            monthCalendarHoliday.MinDate = PlanDeliveryByPickupSettings.MinDate;
-            monthCalendarHoliday.MaxDate = PlanDeliveryByPickupSettings.MaxDate;
-
-            PlanDelivery plan = new PlanDelivery();
+            plan = new PlanDelivery();
+            dataGridSlots.DataSource = plan.TimeSlotTable;
             plan.MakeBookingTable();
             plan.SeedVacationTable(2019);
             dataGridViewBooking.DataSource = plan.BookingTable;
             dataGridViewVacation.DataSource = plan.VacationTable;
+
+            propertyGrid1.SelectedObject = plan.Settings;
+            comboBoxPickupPoint.DataSource = NopSimu.PickupTable;
+            comboBoxPickupPoint.DisplayMember = "PickupName";
+
+            monthCalendarHoliday.MinDate = plan.Settings.MinDate;
+            monthCalendarHoliday.MaxDate = plan.Settings.MaxDate;
         }
 
         private void comboBoxPickupPoint_SelectedIndexChanged(object sender, EventArgs e)
@@ -41,9 +40,8 @@ namespace PlanDelivery
 
         private void GenerateButton_Click(object sender, EventArgs e)
         {
-            SlotTable = PlanDeliveryByPickupSettings.GetSlotsTableStruc();
-            PlanDeliveryByPickupSettings.InitSlotTable(SlotTable);
-            dataGridSlots.DataSource = SlotTable;
+            plan.InitSlotTable(12);
+            dataGridSlots.DataSource = plan.TimeSlotTable;
         }
     }
 }
