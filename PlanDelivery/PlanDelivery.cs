@@ -85,6 +85,11 @@ namespace PlanDelivery
         /// </summary>
         public int TimeSlotDuration { get; set; } = 2;
 
+        /// <summary>
+        /// Increment of the time slot
+        /// </summary>
+        public int TimeSlotIncrement { get; set; } = 1;
+
         //bof. vaut mieux une DataTable
         //idpickup, id, hour, day
         static string[] days = new string[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
@@ -117,18 +122,19 @@ namespace PlanDelivery
             {
                 DateTime date1 = start.AddDays(i);
 
-                colName = date1.ToShortDateString();
+                colName = date1.ToString("dddd") + Environment.NewLine + date1.ToShortDateString();
                 //dt.Columns.Add(colName, typeof(float));
                 BookingTable.Columns.Add(colName, typeof(string));
             }
             //Must take in account Summer lightning
-            for (int h = Settings.DeliveryStartsAt.Hours; h < Settings.DeliveryStopsAt.Hours; h += Settings.TimeSlotDuration)
+            for (int h = Settings.DeliveryStartsAt.Hours; h < Settings.DeliveryStopsAt.Hours; h += Settings.TimeSlotIncrement)
             {
                 DataRow row = BookingTable.NewRow();
                 string s = String.Format("{0:00}H00 - {1:00}H00", h, h + Settings.TimeSlotDuration);
                 row[Settings.HoursString] = s;
                 for (int i = 1; i < BookingTable.Columns.Count; i++)
                 {
+                    //This is where it should get it from TimeSlots
                     row[i] = Settings.DefaultFee + "€";
                     //if ... row[i] = "-"
                     //TimeSlots[i]--;
@@ -183,7 +189,8 @@ namespace PlanDelivery
         {
             DataColumn col;
             VacationTable = new DataTable();
-            VacationTable.Columns.Add("PickupId", typeof(int));
+            col = VacationTable.Columns.Add("PickupId", typeof(int));
+            col.AllowDBNull = false;
             col = VacationTable.Columns.Add("Id", typeof(int));
             col.AutoIncrement = true;
             VacationTable.Columns.Add("WeekNo", typeof(int));
@@ -204,15 +211,22 @@ namespace PlanDelivery
         }
 
 
+        public DataTable GetVacationTableAsDates()
+        {
+            return new DataTable();
+        }
+
+        //get row depending on the date
         public void SeedVacationTable(int year)
         {
             if (VacationTable == null)
                 BuildVacationTable(DateTime.Now.Year);
 
-            for (int d = 1; d < 31; d++)
+            for (int d = 1; d < 2; d++)
             {
                 DateTime date = new DateTime(year, 08, d);
                 DataRow row = VacationTable.NewRow();
+                row["PickupId"] = 24;
                 foreach (string sDay in new string[]
                 { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" })
                     row[sDay] = 1;
@@ -241,7 +255,7 @@ namespace PlanDelivery
 
         public void InitSlotTable(int PickupId)
         {
-        
+
             //From PickupId
             DataRow row;
             for (int h = Settings.DeliveryStartsAt.Hours; h < Settings.DeliveryStopsAt.Hours; h += Settings.TimeSlotDuration)
@@ -261,10 +275,12 @@ namespace PlanDelivery
         }
         /// <summary>
         /// New weekly timeslots with copy
+        /// To be done in V2
         /// </summary>
         /// <param name="PickupId"></param>
         public void GenerateDefaultTimeSlots(int PickupId, int PickupIdCopyFrom = -1)
         {
+
         }
 
 

@@ -60,7 +60,7 @@
     <Compile Include="Form2.Designer.cs">
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
-    <Compile Include="PlanDeliverySettings.cs" />
+    <Compile Include="PlanDelivery.cs" />
     <Compile Include="PlanDeliveryForm.cs">
       <SubType>Form</SubType>
     </Compile>

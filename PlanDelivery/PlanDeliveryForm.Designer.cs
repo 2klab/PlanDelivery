@@ -35,7 +35,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.dataGridSlots = new System.Windows.Forms.DataGridView();
+            this.dataGridTimeslot = new System.Windows.Forms.DataGridView();
             this.comboBoxPickupPoint = new System.Windows.Forms.ComboBox();
             this.GenerateButton = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
@@ -45,14 +45,16 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewBooking)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridSlots)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridTimeslot)).BeginInit();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVacation)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // propertyGrid1
@@ -92,6 +94,7 @@
             this.dataGridViewBooking.RowTemplate.Height = 24;
             this.dataGridViewBooking.Size = new System.Drawing.Size(639, 391);
             this.dataGridViewBooking.TabIndex = 8;
+            this.dataGridViewBooking.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewBooking_CellClick);
             // 
             // tabControl1
             // 
@@ -121,7 +124,7 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.dataGridSlots);
+            this.tabPage2.Controls.Add(this.dataGridTimeslot);
             this.tabPage2.Controls.Add(this.comboBoxPickupPoint);
             this.tabPage2.Controls.Add(this.GenerateButton);
             this.tabPage2.Controls.Add(this.propertyGrid1);
@@ -134,19 +137,19 @@
             this.tabPage2.Text = "Admin View Settings";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // dataGridSlots
+            // dataGridTimeslot
             // 
-            this.dataGridSlots.AllowUserToAddRows = false;
-            this.dataGridSlots.AllowUserToDeleteRows = false;
-            this.dataGridSlots.AllowUserToOrderColumns = true;
-            this.dataGridSlots.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridSlots.Location = new System.Drawing.Point(377, 41);
-            this.dataGridSlots.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.dataGridSlots.Name = "dataGridSlots";
-            this.dataGridSlots.RowHeadersWidth = 51;
-            this.dataGridSlots.RowTemplate.Height = 24;
-            this.dataGridSlots.Size = new System.Drawing.Size(691, 416);
-            this.dataGridSlots.TabIndex = 10;
+            this.dataGridTimeslot.AllowUserToAddRows = false;
+            this.dataGridTimeslot.AllowUserToDeleteRows = false;
+            this.dataGridTimeslot.AllowUserToOrderColumns = true;
+            this.dataGridTimeslot.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridTimeslot.Location = new System.Drawing.Point(377, 41);
+            this.dataGridTimeslot.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dataGridTimeslot.Name = "dataGridTimeslot";
+            this.dataGridTimeslot.RowHeadersWidth = 51;
+            this.dataGridTimeslot.RowTemplate.Height = 24;
+            this.dataGridTimeslot.Size = new System.Drawing.Size(691, 433);
+            this.dataGridTimeslot.TabIndex = 10;
             // 
             // comboBoxPickupPoint
             // 
@@ -172,6 +175,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.dataGridView1);
             this.tabPage3.Controls.Add(this.dataGridViewVacation);
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
@@ -188,7 +192,7 @@
             this.dataGridViewVacation.Name = "dataGridViewVacation";
             this.dataGridViewVacation.RowHeadersWidth = 51;
             this.dataGridViewVacation.RowTemplate.Height = 24;
-            this.dataGridViewVacation.Size = new System.Drawing.Size(1078, 647);
+            this.dataGridViewVacation.Size = new System.Drawing.Size(691, 642);
             this.dataGridViewVacation.TabIndex = 0;
             // 
             // label1
@@ -235,6 +239,21 @@
             this.button1.TabIndex = 13;
             this.button1.Text = "Confirm";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.AllowUserToOrderColumns = true;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(743, 27);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersWidth = 51;
+            this.dataGridView1.RowTemplate.Height = 24;
+            this.dataGridView1.Size = new System.Drawing.Size(385, 530);
+            this.dataGridView1.TabIndex = 1;
             // 
             // PlanDeliveryForm
             // 
@@ -252,10 +271,11 @@
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridSlots)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridTimeslot)).EndInit();
             this.tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVacation)).EndInit();
             this.groupBox1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -271,13 +291,14 @@
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.ComboBox comboBoxPickupPoint;
         private System.Windows.Forms.Button GenerateButton;
-        private System.Windows.Forms.DataGridView dataGridSlots;
+        private System.Windows.Forms.DataGridView dataGridTimeslot;
         private System.Windows.Forms.DataGridView dataGridViewVacation;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
 
