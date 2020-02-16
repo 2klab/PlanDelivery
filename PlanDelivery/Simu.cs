@@ -12,6 +12,9 @@ namespace PlanDelivery
         /// </summary>
         public DataTable PickupTable { get; set; }
         public DataTable OrderTable { get; set; }
+        public DataTable ClientTable { get; set; }
+        public DataTable Client_OrderTable { get; set; }
+
 
         public Simu(DataSet simuDataSet)
         {
@@ -35,7 +38,7 @@ namespace PlanDelivery
             rowp["PickupName"] = "Marche bio Garenne";
             PickupTable.Rows.Add(rowp);
 
-            OrderTable = SimuDataSet.Tables.Add("Orders");
+            OrderTable = SimuDataSet.Tables.Add("Order");
             col = OrderTable.Columns.Add("Id", typeof(int));
             col.AutoIncrement = true;
             col = OrderTable.Columns.Add("PickupId", typeof(int));

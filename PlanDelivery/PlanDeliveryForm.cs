@@ -23,9 +23,9 @@ namespace PlanDelivery
             plan.SeedVacationTable(2019);
             plan.GenerateDefaultTimeSlots(24);
 
-            dataGridTimeslot.DataSource = plan.TimeSlotTable;
+            dataGridViewBooking.DataSource = plan.BookingTable;//ne tient pas compte des bookings deja faits
 
-            dataGridViewBooking.DataSource = plan.BookingTable;
+            dataGridTimeslot.DataSource = plan.TimeSlotTable;
             dataGridViewVacation.DataSource = plan.VacationTable;
 
             propertyGrid1.SelectedObject = plan.Settings;

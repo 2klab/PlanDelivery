@@ -4,6 +4,7 @@ using System.Globalization;
 
 namespace PlanDelivery
 {
+    //TableName=StorePickupPointSettings
     public class PlanDeliveryByPickupSettings
     {
         public string HoursString = " ";
@@ -73,7 +74,7 @@ namespace PlanDelivery
         /// <summary>
         /// Not used
         /// </summary>
-        public int[,] WeeklyTimeSlots = new int[24, 7];//rows,cols
+        //public int[,] WeeklyTimeSlots = new int[24, 7];//rows,cols
 
         /// <summary>
         /// How many delivery for this timeslot
@@ -97,9 +98,16 @@ namespace PlanDelivery
         /// <summary>
         /// Days of the week where the pickup point is opened
         /// </summary>
-        public string[] DeliveryDays { get; set; } = new string[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+        //public string[] DeliveryDays { get; set; } = new string[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+        public int[] DeliveryDayOpen { get; set; } = new int[] { 1, 0, 1, 0, 1, 1, 1 };
 
-
+        /// <summary>
+        /// Delivery is possible if flying distance between customer and extended pickup is less than
+        /// </summary>
+        public float FlyDistMax { get; set; } = 500;
+        //public DitanceBtwTwoAdressesSettingsID;
+        //Non car adresse1=customer, adresse2=pickup location address
+        //Il faut des fixed adresses pour les 2
     }
 
     public class PlanDelivery
@@ -108,7 +116,6 @@ namespace PlanDelivery
             = new PlanDeliveryByPickupSettings();
 
         public DataTable VacationTable { get; set; }
-
         public DataTable BookingTable { get; set; }
         public DataTable TimeSlotTable { get; set; }
         public void MakeBookingTable()
@@ -134,10 +141,17 @@ namespace PlanDelivery
                 row[Settings.HoursString] = s;
                 for (int i = 1; i < BookingTable.Columns.Count; i++)
                 {
-                    //This is where it should get it from TimeSlots
-                    row[i] = Settings.DefaultFee + "€";
-                    //if ... row[i] = "-"
-                    //TimeSlots[i]--;
+                    int dow = (int)Settings.MinDate.DayOfWeek;
+                    int dayNo = (i - 1 + dow) % 7;
+                    string text;
+                    //Tenir compte des vacations ici
+                    //check vacation table
+                    //Simple one, by week, simple click to assign a day off
+                    if (Settings.DeliveryDayOpen[dayNo] == 0)
+                        text = "-";
+                    else
+                        text = Settings.DefaultFee + "€";
+                    row[i] = text;
                 }
                 //check time slot is not full
                 //check vacation
@@ -237,12 +251,13 @@ namespace PlanDelivery
 
         }
 
-        public void MakeTimeSlotTableStruc()
+        public void MakeTimeSlotTableStrucForDisplay()
         {
             DataTable table = new DataTable();
             table.Columns.Add("PickupId", typeof(int));
             table.Columns.Add("Hour", typeof(TimeSpan));
             //table.Columns.Add("Description?", typeof(TimeSpan));
+            //add 0,1,2,3,4,5,6 + start from date
             table.Columns.Add("Mon", typeof(int));
             table.Columns.Add("Tue", typeof(int));
             table.Columns.Add("Wed", typeof(int));
@@ -255,8 +270,6 @@ namespace PlanDelivery
 
         public void InitSlotTable(int PickupId)
         {
-
-            //From PickupId
             DataRow row;
             for (int h = Settings.DeliveryStartsAt.Hours; h < Settings.DeliveryStopsAt.Hours; h += Settings.TimeSlotDuration)
             {
@@ -264,10 +277,18 @@ namespace PlanDelivery
                 row["PickupId"] = PickupId;
                 row["Hour"] = TimeSpan.FromHours(h);
                 if (h >= Settings.DeliveryStartsAt.Hours && h <= Settings.DeliveryStopsAt.Hours)
-                {
+                {/*
                     foreach (string d in Settings.DeliveryDays)
                     {
                         row[d] = Settings.DefaultTimeSlotCapacity;
+                    }
+                    */
+                    //starting day
+                    for (int day = 0; day < 7; day++)
+                    {
+                        int rd = (Settings.WeekStartsOn + day) % 7;
+                        String s = rd.ToString("W");
+                        row[s] = Settings.DefaultTimeSlotCapacity;
                     }
                 }
                 TimeSlotTable.Rows.Add(row);
