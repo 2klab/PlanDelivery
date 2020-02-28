@@ -18,10 +18,12 @@ namespace PlanDelivery
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            tabControl1.SelectedIndex = 3;
             plan = new PlanDelivery();
             plan.MakeBookingTable();
-            plan.SeedVacationTable(2019);
-            plan.GenerateDefaultTimeSlots(24);
+            plan.SeedVacationTable(24, 2019);
+            plan.MakeDefaultTimeSlots(24);
+            plan.MakeFullYearVacationTableForAPickup(24, 2020);
 
             dataGridViewBooking.DataSource = plan.BookingTable;//ne tient pas compte des bookings deja faits
 
@@ -59,6 +61,11 @@ namespace PlanDelivery
             //slot--
             //add order
 
+        }
+
+        private void dataGridViewBooking_DataSourceChanged(object sender, EventArgs e)
+        {
+            //remove PickupId
         }
     }
 }

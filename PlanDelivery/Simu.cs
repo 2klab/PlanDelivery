@@ -39,7 +39,7 @@ namespace PlanDelivery
             PickupTable.Rows.Add(rowp);
 
             OrderTable = SimuDataSet.Tables.Add("Order");
-            col = OrderTable.Columns.Add("Id", typeof(int));
+            col = OrderTable.Columns.Add("Id", typeof(int)); 
             col.AutoIncrement = true;
             col = OrderTable.Columns.Add("PickupId", typeof(int));
             col.AllowDBNull = false;
